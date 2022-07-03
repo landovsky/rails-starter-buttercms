@@ -1,6 +1,7 @@
 module ButtercmsHelper
   extend ActiveSupport::Concern
   included do
+    # TODO: obsah metody neodpovídá názvu metody, přejmenovat
     before_action :check_token
 
     rescue_from ApiKeyNotSetError do
@@ -25,6 +26,7 @@ module ButtercmsHelper
     end
 
     rescue_from ButterCMS::Error do |e|
+      # TODO: re-raisnout error pokud to není invalid token
       if e.message == 'Invalid token.'
         logger.warn 'Your Butter token is set to an invalid value. Please verify your token is correct.'
       end
@@ -33,6 +35,7 @@ module ButtercmsHelper
   end
 
   def butter_collection(collection_name, options = {})
+    # TODO to .first je hrozně divný, co je v té kolekci na které to voláš?
     ButterCMS::Content.list(collection_name.to_s, merge_preview(options)).first.data[1]
   rescue ButterCMS::NotFound
     raise ButterCmsResourceNotFoundError, "Collection: #{collection_name} was not found in Butter CMS API"
@@ -52,6 +55,7 @@ module ButtercmsHelper
   def butter_post(slug, options = {})
     ButterCMS::Post.find(slug, merge_preview(options))
   rescue ButterCMS::NotFound
+    # TODO: nedoplníme taky slug do logu?
     raise ButterCmsPostNotFoundError
   end
 
@@ -69,6 +73,7 @@ module ButtercmsHelper
 
   private
 
+  # TODO: nedáme sem taky log warn aby sis název proměnné přečetl z logu?
   def check_token
     raise ApiKeyNotSetError if ENV['RAILS_BUTTER_CMS_API_KEY'].blank?
 
